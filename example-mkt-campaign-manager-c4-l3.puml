@@ -1,0 +1,36 @@
+@startuml
+!include <C4/C4_Component.puml>
+
+title "Component diagram of the API Application"
+
+footer "<admin@dkisler.com> - %date('yyyy-MM-dd')"
+
+Container_Ext(ui, "Our WebClient", "JavaScript", "UI used by our customers to manage campaigns.")
+
+System_Boundary(b, "API") {
+    Component(web, "Webserver", "FastAPI/express.js", "Handles HTTP requests.")
+    Component(handler, "Campaign Run Handler", "", "Starts and ends campaigns.")
+    Component(dbClient, "Database Adapter", "", "Handles communication with database.")
+    Component(pubsubClient, "PubSub Adapter", "", "Handles communication with message broker.")
+    Component(mktPlatformClient, "Sourcing Platform Adapter", "HTTPClient", "Handles communication with traffic sourcing platform.")
+}
+
+ContainerDb(db, "Campaign Repository", "Postgres", "Stores the campaign state.\n")
+System_Ext(mkt, "Sourcing Platform", "Generates traffic for the customer's website.")
+SystemQueue_Ext(pubsub, "PubSub", "Mediates communication between systems.")
+
+Rel_D(ui, web, "Makes API calls", "async, HTTPS/JSON")
+
+Rel_D(web, handler, "Uses")
+
+Rel_L(handler, dbClient, "Uses")
+Rel_L(dbClient, db, "Reads/Writes", "sync, TCP/Postgres wire")
+
+Rel_D(handler, pubsubClient, "Uses")
+Rel_D(pubsubClient, pubsub, "Publishes and consumes events", "sync, TCP/AVRO")
+
+Rel_R(handler, mktPlatformClient, "Uses")
+Rel_R(mktPlatformClient, mkt, "Updates campaign\nReads campaign stats", "sync, HTTPS/JSON")
+
+SHOW_LEGEND()
+@enduml
