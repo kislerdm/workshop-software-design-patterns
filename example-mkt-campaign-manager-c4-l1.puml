@@ -1,0 +1,27 @@
+@startuml
+!include <C4/C4_Container.puml>
+
+title "Context diagram of the Marketing-as-a-Service Platform"
+
+footer "<admin@dkisler.com> - %date('yyyy-MM-dd')"
+
+Person(user, "Customer")
+Person_Ext(userExt, "Customer Website's User")
+
+System(ui, "Our WebClient", "UI used by our customers to manage campaigns.")
+System(be, "Campaign Manager", "Manages customer's marketing campaigns.")
+System(be, "Campaign Manager", "Manages customer's marketing campaigns.")
+System_Ext(mkt, "Sourcing Platform", "Generates traffic for the customer's website.")
+
+System_Ext(uiExt, "Our Customer's WebClient")
+
+Rel_D(user, ui, "Uses", "HTTPS")
+Rel_D(ui, be, "Uses", "HTTPS/JSON")
+Rel_D(be, mkt, "Manages campaigns", "HTTPS/JSON")
+Rel_L(mkt, uiExt, "Sends user", "HTTPS")
+Rel_U(uiExt, be, "Sends acquired user's data", "HTTPS/JSON")
+Rel_U(userExt, mkt, "Uses", "HTTPS")
+Rel_U(userExt, uiExt, "Uses", "HTTPS")
+
+SHOW_LEGEND()
+@enduml

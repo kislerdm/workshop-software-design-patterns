@@ -1,0 +1,25 @@
+@startuml
+!include <C4/C4_Container.puml>
+
+title "Container diagram of the Campaign Manager System"
+
+footer "<admin@dkisler.com> - %date('yyyy-MM-dd')"
+
+System_Boundary(b, "Campaign Manager") {
+    Container(eng, "API", "Python/TS/Go Application", "Handles all business logic acting as a gateway between customer and traffic sourcing platforms.")
+    ContainerDb(db, "Campaign Repository", "Postgres", "Stores the campaign state.\n")
+    System_Ext(ml, "Optimisation Engine", "Manages marketing investment in time.\nIt collects information about acquired users and marketing costs to be in line with the customer's demands. It relies on advanced analytics to maximise ROI.")
+    SystemQueue_Ext(pubsub, "PubSub", "Mediates communication between systems.")
+}
+
+Container_Ext(ui, "Our WebClient", "JavaScript", "UI used by our customers to manage campaigns.")
+System_Ext(mkt, "Sourcing Platform", "Generates traffic for the customer's website.")
+
+Rel_D(ui, eng, "Uses", "async, HTTPS/JSON")
+Rel_U(ml, pubsub, "Publishes and consumes events", "sync, TCP/AVRO")
+Rel_L(eng, db, "Reads/Writes", "sync, TCP/Postgres wire")
+Rel_D(eng, pubsub, "Publishes and consumes events", "sync, TCP/AVRO")
+Rel_R(eng, mkt, "Updates campaign", "sync, HTTPS/JSON")
+
+SHOW_LEGEND()
+@enduml
