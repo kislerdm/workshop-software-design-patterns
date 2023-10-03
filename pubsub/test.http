@@ -1,0 +1,8 @@
+POST http://localhost:9000/publish/foo.bar
+
+{"foo": "qux1"}
+
+###
+
+GET http://localhost:9000/consume/foo.bar/myconsumer
+
